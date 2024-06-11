@@ -7,6 +7,7 @@ const App = () => {
   const [maxPrice, setMaxPrice] = useState(50);
 
   const addProductNew = () => {
+    console.log("rendering list");
     const updatedProducts = products.concat({
       id: products.length + 1,
       name: newProductName,
@@ -14,40 +15,37 @@ const App = () => {
     });
     setNewProductName("");
     setNewProductPrice("");
+    console.log(updatedProducts);
     setProducts(updatedProducts);
   };
 
-  const ProductList = ({ products, maxPrice }) => {
-    const filteredByPrice = useMemo(() => {
-      if (maxPrice) {
-        return products.filter((product) => product.price <= maxPrice);
-      } else {
-        return products;
+  const filterByPrice = () => {
+    const filtered = [];
+    for (let i = 0; i < products.length; i++) {
+      if (products[i].price <= maxPrice) {
+        filtered.push(products[i]);
       }
-    }, [products, maxPrice]);
-    return (
+    }
+  };
+
+  const calculateTotalPrice = () => {
+    let total = 0;
+    for (let i = 0; i < products.length; i++) {
+      total += products[i].price;
+    }
+    return total;
+  };
+
+  return (
+    <div>
+      <h1>Product List</h1>
       <ul>
-        {filteredByPrice.map((product) => (
+        {products.map((product) => (
           <li key={product.id}>
             {product.name} - ${product.price}
           </li>
         ))}
       </ul>
-    );
-  };
-
-  const calculateTotalPrice = useMemo(() => {
-    console.log("calulating");
-    return products.reduce(
-      (accumulator, product) => accumulator + product.price,
-      0
-    );
-  }, [products]);
-
-  return (
-    <div>
-      <h1>Product List</h1>
-      <ProductList products={products} />
       <input
         type="text"
         value={newProductName}
@@ -62,8 +60,14 @@ const App = () => {
       />
       <button onClick={addProductNew}>Add Product</button>
       <h2>Products Priced Below ${maxPrice}:</h2>
-      <ProductList products={products} maxPrice={maxPrice} />
-      <h2>Total Price of Products: ${calculateTotalPrice}</h2>
+      <ul>
+        {filterByPrice().map((product) => (
+          <li key={product.id}>
+            {product.name} - ${product.price}
+          </li>
+        ))}
+      </ul>
+      <h2>Total Price of Products: ${calculateTotalPrice()}</h2>
       <input
         type="number"
         value={maxPrice}
