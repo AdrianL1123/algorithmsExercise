@@ -37,11 +37,7 @@ const App = () => {
   };
 
   const calculateTotalPrice = useMemo(() => {
-    console.log("calulating");
-    return products.reduce(
-      (accumulator, product) => accumulator + product.price,
-      0
-    );
+    return products.reduce((total, product) => total + product.price, 0);
   }, [products]);
 
   return (
