@@ -1,5 +1,26 @@
 import React, { useState, useMemo, memo } from "react";
 
+//* need to move up to avoid any re-rendering
+const ProductList = memo(({ products, maxPrice }) => {
+  console.log("ProductList rendered");
+  const filteredByPrice = useMemo(() => {
+    if (maxPrice) {
+      return products.filter((product) => product.price <= maxPrice);
+    } else {
+      return products;
+    }
+  }, [products, maxPrice]);
+  return (
+    <ul>
+      {filteredByPrice.map((product) => (
+        <li key={product.id}>
+          {product.name} - ${product.price}
+        </li>
+      ))}
+    </ul>
+  );
+});
+
 const App = () => {
   const [products, setProducts] = useState([]);
   const [newProductName, setNewProductName] = useState("");
@@ -12,28 +33,9 @@ const App = () => {
       name: newProductName,
       price: parseInt(newProductPrice),
     });
+    setProducts(updatedProducts);
     setNewProductName("");
     setNewProductPrice("");
-    setProducts(updatedProducts);
-  };
-
-  const ProductList = ({ products, maxPrice }) => {
-    const filteredByPrice = useMemo(() => {
-      if (maxPrice) {
-        return products.filter((product) => product.price <= maxPrice);
-      } else {
-        return products;
-      }
-    }, [products, maxPrice]);
-    return (
-      <ul>
-        {filteredByPrice.map((product) => (
-          <li key={product.id}>
-            {product.name} - ${product.price}
-          </li>
-        ))}
-      </ul>
-    );
   };
 
   const calculateTotalPrice = useMemo(() => {
@@ -45,7 +47,6 @@ const App = () => {
       <h1>Product List</h1>
       <ProductList products={products} />
       <input
-        type="text"
         value={newProductName}
         onChange={(e) => setNewProductName(e.target.value)}
         placeholder="New Product Name"
